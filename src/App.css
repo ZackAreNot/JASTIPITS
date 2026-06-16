@@ -2058,7 +2058,7 @@ button {
   align-items: end;
   gap: 10px;
   margin: 0 20px 18px;
-  padding: 18px;
+  padding: 18px 18px 26px;
   border-radius: 16px;
   color: #fff;
   background: linear-gradient(135deg, var(--pink), var(--red));
@@ -2071,8 +2071,13 @@ button {
   text-align: center;
 }
 
+.podium-card .runner-up,
+.podium-card .second-runner-up {
+  transform: translateY(0);
+}
+
 .podium-card .winner {
-  transform: translateY(-12px);
+  transform: translateY(-10px);
 }
 
 .podium-card b {

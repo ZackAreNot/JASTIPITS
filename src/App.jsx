@@ -381,9 +381,8 @@ function HomePage({ cartCount, onAdd }) {
   }, [category, jastiperFilter, query])
 
   function addItem(id) {
-    const item = getMenu(id)
-    onAdd(id)
-    setNotice(`${item.name} masuk cart`)
+    const result = onAdd(id)
+    setNotice(result.message)
     window.setTimeout(() => setNotice(''), 1500)
   }
 
@@ -512,9 +511,11 @@ function HomePage({ cartCount, onAdd }) {
 
 function DetailPage({ onAdd }) {
   const { id } = useParams()
+  const navigate = useNavigate()
   const item = getMenu(id) || menus[0]
   const jastiper = getJastiper(item.jastiperId)
   const [qty, setQty] = useState(1)
+  const [notice, setNotice] = useState('')
 
   return (
     <AppScreen className="detail-screen">
@@ -553,14 +554,26 @@ function DetailPage({ onAdd }) {
           <Link
             to="/cart"
             className="primary-action"
-            onClick={() => {
-              for (let index = 0; index < qty; index += 1) onAdd(item.id)
+            onClick={(event) => {
+              const result = onAdd(item.id, qty)
+              if (!result.ok) {
+                event.preventDefault()
+                setNotice(result.message)
+                window.setTimeout(() => setNotice(''), 1600)
+                return
+              }
+
+              if (result.ok) {
+                event.preventDefault()
+                navigate('/cart')
+              }
             }}
           >
             Tambah ke cart
           </Link>
         </div>
       </section>
+      {notice && <div className="toast-v2">{notice}</div>}
     </AppScreen>
   )
 }
@@ -1044,7 +1057,7 @@ function LeaderboardPage({ cartCount }) {
       ['Alibert My ...', '3000'],
       ['Syihan ...', '2500'],
       ['Fahmuy ...', '2400'],
-      ['Satrio Pacarnya Sarwendah', '2255'],
+      ['Satrio Pacarnya Go Youn Jung', '2255'],
       ['Rafi Teknik Sipil', '2180'],
       ['Dina Statistika', '2040'],
       ['Evan GantengZ', '1988'],
@@ -1053,13 +1066,14 @@ function LeaderboardPage({ cartCount }) {
       ['Naufal Elektro', '9200'],
       ['Alibert My ...', '8900'],
       ['Keisya Despro', '8400'],
-      ['Satrio Pacarnya Sarwendah', '8000'],
+      ['Satrio Pacarnya Go Youn Jung', '8000'],
       ['Evan GantengZ', '7900'],
       ['Dina Statistika', '7550'],
       ['Rafi Teknik Sipil', '7300'],
     ],
   }
   const activeRanks = ranks[range]
+  const podiumOrder = [1, 0, 2]
 
   return (
     <AppScreen className="leaderboard-screen has-nav">
@@ -1083,14 +1097,22 @@ function LeaderboardPage({ cartCount }) {
         ))}
       </div>
       <section className="podium-card">
-        {activeRanks.slice(0, 3).map(([name, score], index) => (
-          <div key={name} className={index === 0 ? 'winner' : ''}>
+        {podiumOrder.map((rankIndex, visualIndex) => {
+          const [name, score] = activeRanks[rankIndex]
+          const position = rankIndex + 1
+
+          return (
+            <div
+              key={name}
+              className={position === 1 ? 'winner' : visualIndex === 0 ? 'runner-up' : 'second-runner-up'}
+            >
             <Avatar label={name} />
-            <b>{index + 1}</b>
+            <b>{position}</b>
             <strong>{name}</strong>
             <span>{score}</span>
-          </div>
-        ))}
+            </div>
+          )
+        })}
       </section>
       <section className="rank-list-v2">
         {activeRanks.slice(3).map(([name, score], index) => (
@@ -1124,8 +1146,24 @@ function AppRoutes() {
   const [orderHistory, setOrderHistory] = useState(initialOrderHistory)
   const cartCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0)
 
-  function addToCart(id) {
-    setCart((current) => ({ ...current, [id]: (current[id] || 0) + 1 }))
+  function addToCart(id, qty = 1) {
+    const item = getMenu(id)
+    if (!item) {
+      return { ok: false, message: 'Menu tidak ditemukan' }
+    }
+
+    const existingItems = getCartItems(cart)
+    const activeJastiperId = existingItems[0]?.jastiperId
+
+    if (activeJastiperId && activeJastiperId !== item.jastiperId) {
+      return {
+        ok: false,
+        message: 'Selesaikan transaksi dengan 1 jastiper dulu',
+      }
+    }
+
+    setCart((current) => ({ ...current, [id]: (current[id] || 0) + qty }))
+    return { ok: true, message: `${item.name} masuk cart` }
   }
 
   function updateCart(id, delta) {
