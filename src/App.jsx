@@ -201,6 +201,16 @@ const vouchers = [
   { id: 'v50', label: '50% OFF', color: 'purple' },
 ]
 
+const initialOrderHistory = [
+  {
+    id: 'history-roti-becek',
+    image: assets.rotiBecek,
+    name: 'Roti Becek Mas Evan',
+    when: 'Selesai kemarin',
+    total: 10000,
+  },
+]
+
 const rupiah = (value) => `Rp ${value.toLocaleString('id-ID')}`
 const getJastiper = (id) => jastipers.find((item) => item.id === id)
 const getMenu = (id) => menus.find((item) => item.id === id)
@@ -382,6 +392,8 @@ function HomePage({ cartCount, onAdd }) {
       hasMountedRef.current = true
       return
     }
+
+    if (jastiperFilter === 'all') return
 
     const frame = window.requestAnimationFrame(() => {
       menuSectionRef.current?.scrollIntoView({
@@ -734,7 +746,7 @@ function WaitingPage() {
   )
 }
 
-function ActivityPage({ cartCount }) {
+function ActivityPage({ cartCount, orderHistory }) {
   return (
     <AppScreen className="activity-screen has-nav">
       <header className="page-header no-back">
@@ -751,14 +763,16 @@ function ActivityPage({ cartCount }) {
       </section>
       <section className="history-list">
         <h2>Riwayat</h2>
-        <article>
-          <PhotoBox src={assets.rotiBecek} alt="Roti Becek Mas Evan" />
-          <div>
-            <strong>Roti Becek Mas Evan</strong>
-            <span><br />Selesai kemarin</span>
-          </div>
-          <b>Rp 10.000</b>
-        </article>
+        {orderHistory.map((item) => (
+          <article key={item.id}>
+            <PhotoBox src={item.image} alt={item.name} />
+            <div>
+              <strong>{item.name}</strong>
+              <span>{item.when}</span>
+            </div>
+            <b>{rupiah(item.total)}</b>
+          </article>
+        ))}
       </section>
       <BottomNav cartCount={cartCount} />
     </AppScreen>
@@ -815,10 +829,17 @@ function ChatPage() {
   )
 }
 
-function FinishPage() {
+function FinishPage({ onCompleteOrder }) {
   const [rating, setRating] = useState(4)
   const [done, setDone] = useState(false)
   const [feedback, setFeedback] = useState('')
+  const hasCompletedRef = useRef(false)
+
+  useEffect(() => {
+    if (hasCompletedRef.current) return
+    hasCompletedRef.current = true
+    onCompleteOrder?.()
+  }, [onCompleteOrder])
 
   return (
     <AppScreen className="finish-screen">
@@ -1023,7 +1044,7 @@ function LeaderboardPage({ cartCount }) {
       ['Alibert My ...', '3000'],
       ['Syihan ...', '2500'],
       ['Fahmuy ...', '2400'],
-      ['Satrio Pacarnya Keisya', '2255'],
+      ['Satrio Pacarnya Sarwendah', '2255'],
       ['Rafi Teknik Sipil', '2180'],
       ['Dina Statistika', '2040'],
       ['Evan GantengZ', '1988'],
@@ -1032,7 +1053,7 @@ function LeaderboardPage({ cartCount }) {
       ['Naufal Elektro', '9200'],
       ['Alibert My ...', '8900'],
       ['Keisya Despro', '8400'],
-      ['Satrio Pacarnya Keisya', '8000'],
+      ['Satrio Pacarnya Sarwendah', '8000'],
       ['Evan GantengZ', '7900'],
       ['Dina Statistika', '7550'],
       ['Rafi Teknik Sipil', '7300'],
@@ -1100,6 +1121,7 @@ function NotFoundPage() {
 
 function AppRoutes() {
   const [cart, setCart] = useState({})
+  const [orderHistory, setOrderHistory] = useState(initialOrderHistory)
   const cartCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0)
 
   function addToCart(id) {
@@ -1114,6 +1136,22 @@ function AppRoutes() {
       else next[id] = nextQty
       return next
     })
+  }
+
+  function completeOrder() {
+    const items = getCartItems(cart)
+    if (!items.length) return
+
+    const completedItems = items.map((item, index) => ({
+      id: `${item.id}-${Date.now()}-${index}`,
+      image: item.image,
+      name: item.qty > 1 ? `${item.name} x${item.qty}` : item.name,
+      when: 'Selesai barusan',
+      total: item.price * item.qty,
+    }))
+
+    setOrderHistory((current) => [...completedItems, ...current])
+    setCart({})
   }
 
   return (
@@ -1134,9 +1172,9 @@ function AppRoutes() {
       <Route path="/payment/membership" element={<MembershipPaymentPage />} />
       <Route path="/waiting" element={<WaitingPage />} />
       <Route path="/menunggu-pesanan" element={<Navigate to="/waiting" replace />} />
-      <Route path="/activity" element={<ActivityPage cartCount={cartCount} />} />
+      <Route path="/activity" element={<ActivityPage cartCount={cartCount} orderHistory={orderHistory} />} />
       <Route path="/chat-driver" element={<ChatPage />} />
-      <Route path="/finish-order" element={<FinishPage />} />
+      <Route path="/finish-order" element={<FinishPage onCompleteOrder={completeOrder} />} />
       <Route path="/voucher" element={<VoucherPage cartCount={cartCount} />} />
       <Route path="/profile" element={<ProfilePage cartCount={cartCount} />} />
       <Route path="/membership" element={<MembershipPage />} />

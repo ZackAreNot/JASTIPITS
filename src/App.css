@@ -1519,11 +1519,21 @@ button {
   box-shadow: 0 8px 22px rgba(20, 18, 32, 0.08);
 }
 
+.history-list article > div {
+  display: grid;
+  gap: 4px;
+}
+
+.history-list strong {
+  display: block;
+}
+
 .history-list .photo-box {
   height: 56px;
 }
 
 .history-list span {
+  display: block;
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
