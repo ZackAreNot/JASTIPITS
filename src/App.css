@@ -628,6 +628,10 @@ button {
   padding: 2px 20px 10px;
 }
 
+.menu-section-anchor {
+  scroll-margin-top: 14px;
+}
+
 .section-heading h2 {
   margin: 0;
   font-size: 18px;

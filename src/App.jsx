@@ -8,7 +8,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom'
-import { Children, useEffect, useMemo, useState } from 'react'
+import { Children, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 
 const assets = {
@@ -352,6 +352,8 @@ function HomePage({ cartCount, onAdd }) {
   const [category, setCategory] = useState('Semua')
   const [jastiperFilter, setJastiperFilter] = useState('all')
   const [notice, setNotice] = useState('')
+  const menuSectionRef = useRef(null)
+  const hasMountedRef = useRef(false)
   const openJastipers = jastipers.filter((item) => item.status === 'open')
 
   const visibleMenus = useMemo(() => {
@@ -374,6 +376,22 @@ function HomePage({ cartCount, onAdd }) {
     setNotice(`${item.name} masuk cart`)
     window.setTimeout(() => setNotice(''), 1500)
   }
+
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true
+      return
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      menuSectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [jastiperFilter])
 
   return (
     <AppScreen className="home-screen has-nav">
@@ -457,7 +475,7 @@ function HomePage({ cartCount, onAdd }) {
         ))}
       </section>
 
-      <div className="section-heading">
+      <div className="section-heading menu-section-anchor" ref={menuSectionRef}>
         <h2>Menu dari jastiper aktif</h2>
         <span>{visibleMenus.length} menu</span>
       </div>
