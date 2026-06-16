@@ -55,6 +55,13 @@ const currentUser = {
   avatar: assets.ppEvan,
 }
 
+const MEMBERSHIP_STORAGE_KEY = 'jastipits-membership-plan'
+
+const getSavedMembershipPlan = () => {
+  if (typeof window === 'undefined') return ''
+  return window.localStorage.getItem(MEMBERSHIP_STORAGE_KEY) || ''
+}
+
 const jastipers = [
   {
     id: 'zakuy',
@@ -610,6 +617,7 @@ function PaymentPage({
   amount,
   backTo = '/cart',
   nextTo = '/waiting',
+  secondaryTo = nextTo,
   primaryText = 'Unduh QR code',
   secondaryText = 'Bagikan QR Code',
 }) {
@@ -622,27 +630,31 @@ function PaymentPage({
       <div className="payment-pattern" aria-hidden="true" />
       <BackButton to={backTo} />
       <h1>Payment Methode</h1>
-      <h2>QRIS</h2>
-      <section className="qr-shell">
-        <p>Scan atau unduh QR code</p>
-        <img className="qris-logo-img" src={assets.qrisText} alt="QRIS" />
-        <img className="qr-code-img" src={assets.paymentQr} alt="QR code pembayaran" />
+      <section className="payment-stack">
+        <h2>QRIS</h2>
+        <section className="qr-shell">
+          <p>Scan atau unduh QR code</p>
+          <img className="qris-logo-img" src={assets.qrisText} alt="QRIS" />
+          <img className="qr-code-img" src={assets.paymentQr} alt="QR code pembayaran" />
+        </section>
+        <div className="count-card">
+          <span>Selesaikan pembayaran dalam</span>
+          <strong>00:00:{String(left).padStart(2, '0')}</strong>
+          <i style={{ width: `${left * 10}%` }} />
+        </div>
       </section>
-      <div className="count-card">
-        <span>Selesaikan pembayaran dalam</span>
-        <strong>00:00:{String(left).padStart(2, '0')}</strong>
-        <i style={{ width: `${left * 10}%` }} />
-      </div>
-      <div className="payment-total">
-        <span>Total Pembayaran</span>
-        <strong>{rupiah(paymentTotal)}</strong>
-      </div>
-      <Link to={nextTo} className="primary-action">
-        {primaryText}
-      </Link>
-      <Link to={nextTo} className="plain-action payment-share">
-        {secondaryText}
-      </Link>
+      <section className="payment-actions">
+        <div className="payment-total">
+          <span>Total Pembayaran</span>
+          <strong>{rupiah(paymentTotal)}</strong>
+        </div>
+        <Link to={nextTo} className="primary-action">
+          {primaryText}
+        </Link>
+        <Link to={secondaryTo} className="plain-action payment-share">
+          {secondaryText}
+        </Link>
+      </section>
     </AppScreen>
   )
 }
@@ -656,7 +668,8 @@ function MembershipPaymentPage() {
     <PaymentPage
       amount={amount}
       backTo="/membership"
-      nextTo="/profile"
+      nextTo={`/profile?membership=active&plan=${plan}`}
+      secondaryTo="/profile"
       primaryText="Aktifkan membership"
       secondaryText="Kembali ke profil"
     />
@@ -880,12 +893,47 @@ function VoucherPage({ cartCount }) {
 }
 
 function ProfilePage({ cartCount }) {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [membershipPlan, setMembershipPlan] = useState(() => getSavedMembershipPlan())
+  const [notice, setNotice] = useState('')
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    if (params.get('membership') !== 'active') return
+
+    const plan = params.get('plan') === 'monthly' ? 'monthly' : 'annual'
+    const nextNotice = `JastipITS Plus ${plan === 'monthly' ? 'Monthly' : 'Annual'} aktif`
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(MEMBERSHIP_STORAGE_KEY, plan)
+    }
+    const syncUi = window.setTimeout(() => {
+      setMembershipPlan(plan)
+      setNotice(nextNotice)
+    }, 0)
+    navigate('/profile', { replace: true })
+
+    return () => window.clearTimeout(syncUi)
+  }, [location.search, navigate])
+
+  useEffect(() => {
+    if (!notice) return undefined
+
+    const timeout = window.setTimeout(() => setNotice(''), 2200)
+    return () => window.clearTimeout(timeout)
+  }, [notice])
+
   return (
     <AppScreen className="profile-screen has-nav">
       <section className="profile-hero">
         <Avatar src={currentUser.avatar} label={currentUser.name} />
         <h1>{currentUser.name}</h1>
         <p>{currentUser.status}</p>
+        {membershipPlan && (
+          <span className="profile-member-badge">
+            Member {membershipPlan === 'monthly' ? 'Monthly' : 'Annual'} aktif
+          </span>
+        )}
       </section>
       <section className="profile-stats">
         <div>
@@ -902,11 +950,15 @@ function ProfilePage({ cartCount }) {
         </div>
       </section>
       <section className="profile-menu">
-        <Link to="/membership">Membership JastipITS</Link>
+        <Link to="/membership" className={membershipPlan ? 'profile-membership-link' : ''}>
+          <span>Membership JastipITS</span>
+          {membershipPlan && <b>Aktif</b>}
+        </Link>
         <Link to="/voucher">Voucher diskon</Link>
         <Link to="/leaderboard">Leaderboard</Link>
         <Link to="/activity">Riwayat pesanan</Link>
       </section>
+      {notice && <div className="toast-v2">{notice}</div>}
       <BottomNav cartCount={cartCount} />
     </AppScreen>
   )

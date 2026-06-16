@@ -1083,6 +1083,8 @@ button {
 
 .mini-stepper {
   grid-template-columns: 28px 28px 28px;
+  width: fit-content;
+  justify-self: start;
 }
 
 .mini-stepper button {
@@ -1144,17 +1146,16 @@ button {
 .payment-screen .screen-scroll {
   height: 100%;
   min-height: 0;
-  display: grid;
-  grid-template-rows: auto auto auto minmax(0, 1fr) auto auto auto;
-  align-content: stretch;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  padding: clamp(12px, 2.5svh, 20px) 18px max(12px, env(safe-area-inset-bottom));
+  padding: clamp(10px, 2svh, 16px) 16px max(12px, env(safe-area-inset-bottom));
 }
 
 .payment-pattern {
   position: absolute;
   inset: 0 0 auto;
-  height: clamp(178px, 34svh, 276px);
+  height: clamp(150px, 28svh, 220px);
   background-image: url('/Assets/PaymentAsset/Pattern.png');
   background-size: 100% auto;
   background-repeat: no-repeat;
@@ -1171,30 +1172,32 @@ button {
 .payment-screen h1 {
   position: relative;
   z-index: 1;
-  margin: clamp(15px, 2.8svh, 28px) 0 clamp(18px, 4.8svh, 46px);
+  margin: clamp(10px, 2svh, 18px) 0 clamp(8px, 2svh, 14px);
   text-align: left;
-  font-size: clamp(34px, 9.8vw, 44px);
-  line-height: 1;
+  font-size: clamp(28px, 8.6vw, 38px);
+  line-height: 0.98;
   letter-spacing: 0;
 }
 
-.payment-screen h2 {
+.payment-stack {
   position: relative;
   z-index: 1;
-  margin: 0 0 clamp(10px, 2.2svh, 18px);
+  display: grid;
+  gap: clamp(8px, 1.4svh, 12px);
+}
+
+.payment-screen h2 {
+  margin: 0;
   text-align: center;
-  font-size: clamp(26px, 7vw, 32px);
+  font-size: clamp(22px, 6.4vw, 28px);
   font-weight: 600;
 }
 
 .qr-shell {
-  position: relative;
-  z-index: 1;
   display: grid;
   justify-items: center;
-  align-self: start;
-  gap: clamp(4px, 0.9svh, 8px);
-  padding: clamp(11px, 2svh, 18px) 18px clamp(12px, 2.4svh, 24px);
+  gap: clamp(4px, 0.8svh, 6px);
+  padding: clamp(10px, 1.6svh, 14px) 14px clamp(10px, 1.7svh, 16px);
   border-radius: 8px;
   background:
     linear-gradient(rgba(255, 222, 227, 0.88), rgba(255, 222, 227, 0.88)),
@@ -1206,34 +1209,30 @@ button {
 
 .qr-shell p {
   max-width: 286px;
-  margin: 0 0 clamp(3px, 0.9svh, 9px);
+  margin: 0 0 clamp(2px, 0.6svh, 5px);
   text-align: center;
-  font-size: clamp(22px, 6.4vw, 29px);
+  font-size: clamp(18px, 5.8vw, 22px);
   line-height: 1.08;
   font-weight: 500;
 }
 
 .qris-logo-img {
-  width: clamp(42px, 11.5vw, 58px);
+  width: clamp(34px, 9vw, 44px);
   height: auto;
   object-fit: contain;
 }
 
 .qr-code-img {
-  width: min(clamp(126px, 23svh, 184px), 50vw);
-  height: min(clamp(126px, 23svh, 184px), 50vw);
+  width: min(clamp(110px, 18svh, 150px), 42vw);
+  height: min(clamp(110px, 18svh, 150px), 42vw);
   image-rendering: pixelated;
   object-fit: contain;
 }
 
 .count-card {
-  position: relative;
-  z-index: 1;
   display: grid;
-  align-self: center;
-  gap: clamp(4px, 0.8svh, 8px);
-  margin: clamp(11px, 2svh, 18px) 0 clamp(9px, 2.1svh, 18px);
-  padding: clamp(10px, 1.9svh, 17px) 18px clamp(9px, 1.7svh, 14px);
+  gap: clamp(3px, 0.6svh, 6px);
+  padding: clamp(8px, 1.4svh, 12px) 16px clamp(8px, 1.4svh, 12px);
   border-radius: 12px;
   color: #fff;
   background: var(--red);
@@ -1244,16 +1243,17 @@ button {
 .count-card span {
   max-width: 270px;
   justify-self: center;
-  font-size: clamp(21px, 6.1vw, 28px);
+  font-size: clamp(17px, 5.6vw, 22px);
   line-height: 1.08;
 }
 
 .count-card strong {
-  font-size: clamp(28px, 8vw, 36px);
+  font-size: clamp(22px, 7vw, 30px);
   line-height: 1;
 }
 
 .count-card i {
+  justify-self: center;
   width: 56%;
   height: clamp(5px, 0.9svh, 7px);
   border-radius: 999px;
@@ -1261,17 +1261,25 @@ button {
   transition: width 300ms ease;
 }
 
+.payment-actions {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(8px, 1.2svh, 10px);
+  margin-top: auto;
+  padding-top: clamp(8px, 1.4svh, 10px);
+}
+
 .payment-total {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  align-self: end;
-  margin: 0 0 clamp(8px, 1.5svh, 14px);
-  padding-top: clamp(8px, 1.6svh, 16px);
+  margin: 0;
+  padding-top: clamp(8px, 1.2svh, 10px);
   border-top: 2px solid var(--red);
   color: var(--red);
-  font-size: clamp(17px, 4.8vw, 22px);
+  font-size: clamp(15px, 4.8vw, 19px);
   font-weight: 900;
 }
 
@@ -1281,9 +1289,9 @@ button {
 
 .payment-screen .primary-action,
 .payment-screen .plain-action {
-  min-height: clamp(42px, 5.8svh, 52px);
+  min-height: clamp(40px, 5svh, 46px);
   border-radius: 999px;
-  font-size: clamp(16px, 4.6vw, 21px);
+  font-size: clamp(14px, 4.2vw, 18px);
 }
 
 .payment-screen .primary-action {
@@ -1292,7 +1300,6 @@ button {
 }
 
 .payment-share {
-  margin-top: clamp(6px, 1svh, 10px);
   border: 2px solid var(--red);
   color: var(--red);
   background: #fff;
@@ -1830,6 +1837,16 @@ button {
   margin: 0;
 }
 
+.profile-member-badge {
+  margin-top: 4px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .profile-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1862,6 +1879,10 @@ button {
 }
 
 .profile-menu a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding: 16px;
   border-radius: 14px;
   color: var(--ink);
@@ -1869,6 +1890,16 @@ button {
   box-shadow: 0 8px 22px rgba(20, 18, 32, 0.08);
   text-decoration: none;
   font-weight: 900;
+}
+
+.profile-membership-link b {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(100deg, var(--pink), var(--red));
+  font-size: 11px;
+  line-height: 1;
 }
 
 .voucher-grid-v2 {
@@ -1945,7 +1976,7 @@ button {
 .plan-cards {
   display: grid;
   gap: 14px;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
 }
 
 .plan-cards button {
@@ -1967,6 +1998,16 @@ button {
 
 .plan-cards strong {
   font-size: 24px;
+}
+
+.membership-screen .primary-action {
+  margin-top: 4px;
+  box-shadow: 0 8px 14px rgba(220, 15, 88, 0.12);
+}
+
+.membership-screen .plain-action {
+  margin-top: 14px;
+  box-shadow: none;
 }
 
 .leaderboard-screen {
@@ -2106,75 +2147,63 @@ button {
 
   .cart-item {
     grid-template-columns: 56px 1fr;
+    align-items: start;
   }
 
   .mini-stepper {
     grid-column: 2;
+    margin-top: 6px;
   }
 
   .payment-screen h1 {
-    margin-bottom: clamp(14px, 4svh, 30px);
-    font-size: 32px;
-  }
-
-  .qr-code-img {
-    width: min(clamp(120px, 22svh, 168px), 50vw);
-    height: min(clamp(120px, 22svh, 168px), 50vw);
-  }
-
-  .count-card {
-    margin-bottom: clamp(8px, 1.7svh, 14px);
+    font-size: 30px;
   }
 }
 
 @media (max-height: 700px) {
   .payment-screen .screen-scroll {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
 
   .payment-pattern {
-    height: 190px;
+    height: 150px;
   }
 
   .payment-screen h1 {
-    margin-top: 12px;
-    margin-bottom: 16px;
-    font-size: clamp(30px, 9vw, 36px);
-  }
-
-  .payment-screen h2 {
+    margin-top: 8px;
     margin-bottom: 8px;
-    font-size: 25px;
+    font-size: clamp(26px, 8.2vw, 32px);
   }
 
   .qr-shell {
-    padding-top: 10px;
-    padding-bottom: 12px;
+    padding-top: 8px;
+    padding-bottom: 10px;
   }
 
   .qr-shell p {
-    font-size: clamp(20px, 5.8vw, 24px);
+    font-size: clamp(17px, 5.2vw, 20px);
   }
 
   .qris-logo-img {
-    width: 40px;
+    width: 32px;
   }
 
   .qr-code-img {
-    width: min(128px, 46vw);
-    height: min(128px, 46vw);
-  }
-
-  .count-card {
-    margin-block: 8px;
+    width: min(104px, 38vw);
+    height: min(104px, 38vw);
   }
 
   .count-card span {
-    font-size: clamp(19px, 5.4vw, 23px);
+    font-size: clamp(16px, 5vw, 19px);
   }
 
   .count-card strong {
-    font-size: clamp(27px, 7.2vw, 32px);
+    font-size: clamp(20px, 6.6vw, 26px);
+  }
+
+  .payment-actions {
+    gap: 6px;
+    padding-top: 6px;
   }
 }
