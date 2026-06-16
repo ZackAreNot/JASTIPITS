@@ -829,9 +829,9 @@ function FinishPage() {
           />
         </label>
         <div className="finish-buttons">
-          <button className="primary-action" type="button" onClick={() => setDone(true)}>
+          <Link className="primary-action" to="/home" onClick={() => setDone(true)}>
             Submit
-          </button>
+          </Link>
           <Link to="/home" className="plain-action">
             Skip
           </Link>
