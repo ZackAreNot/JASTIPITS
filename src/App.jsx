@@ -420,6 +420,15 @@ function HomePage({ cartCount, onAdd }) {
         </label>
       </header>
 
+      <section className="home-banner">
+        <div>
+          <h2>Leaderboard</h2>
+          <p>Kamu peringkat 43 minggu ini</p>
+          <Link to="/leaderboard">Selengkapnya</Link>
+        </div>
+        <img src={assets.podium} alt="Leaderboard" />
+      </section>
+
       <section className="open-summary">
         <div>
           <span>Jastip sedang buka</span>
@@ -448,15 +457,6 @@ function HomePage({ cartCount, onAdd }) {
             <small>Tutup {item.closesAt}</small>
           </button>
         ))}
-      </section>
-
-      <section className="home-banner">
-        <div>
-          <h2>Leaderboard</h2>
-          <p>Kamu peringkat 43 minggu ini</p>
-          <Link to="/leaderboard">Selengkapnya</Link>
-        </div>
-        <img src={assets.podium} alt="Leaderboard" />
       </section>
 
       <section className="category-tabs" aria-label="Kategori menu">
